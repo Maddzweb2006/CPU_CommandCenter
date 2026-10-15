@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>02 • Mystery Decoder</title><link rel="stylesheet" href="style.css"></head>
+<body><header class="top"><div class="brand">CPU <span>COMMAND CENTER</span></div><div class="status"><i></i> STEP 02 / 04</div></header>
+<main class="wrap">
+<nav class="progress"><a href="cycle.html">01 Cycle</a><a class="active" href="decoder.html">02 Decoder</a><a href="mission.html">03 Mission Lab</a><a href="challenge.html">04 Challenge</a></nav>
+<div class="page-title"><span class="num">02</span><h1>Mystery <em>Decoder</em></h1></div>
+<p class="lead">Now the CPU gives you a random instruction. You become the decoder: guess its opcode, instruction type, format and operands.</p>
+<div class="decoder-grid">
+<div class="card">
+<div style="font-size:10px;letter-spacing:2px;font-weight:bold;color:#3e5540">CPU GENERATED INSTRUCTION</div>
+<div class="instruction" id="mystery">ADD R1, R2, R3</div>
+<button class="ghost" style="width:100%" onclick="newOne()">↻ Generate New Instruction</button>
+<div class="ai"><b>✦ AI TUTOR</b><span id="tip">Read the first word carefully. It is usually the opcode.</span></div>
+</div>
+<div class="card">
+<div class="guess-grid">
+<div><label>Opcode</label><select id="gOp"><option>ADD</option><option>SUB</option><option>AND</option><option>OR</option><option>LOAD</option><option>STORE</option></select></div>
+<div><label>Type</label><select id="gType"><option>Arithmetic</option><option>Logical</option><option>Data Transfer</option></select></div>
+<div><label>Format</label><select id="gFormat"><option>R-Type</option><option>I-Type</option></select></div>
+<div><label>Operands</label><input id="gOperands" placeholder="e.g. R1, R2, R3"></div>
+</div>
+<button class="primary" style="width:100%;margin-top:18px" onclick="check()">CHECK MY GUESS</button>
+<div class="feedback" id="feedback">Make your prediction, then check it.</div>
+<div class="result" id="answer" style="display:none"><div><small>OPCODE</small><strong id="a1"></strong></div><div><small>TYPE</small><strong id="a2"></strong></div><div><small>FORMAT</small><strong id="a3"></strong></div><div><small>OPERANDS</small><strong id="a4"></strong></div></div>
+</div>
+</div>
+<div class="nav-buttons"><a class="ghost" href="cycle.html">← Previous</a><a class="primary right" href="mission.html">Next: CPU Mission Lab →</a></div>
+</main><footer><strong>CPU Command Center</strong><span>Mystery Decoder</span></footer>
+<script>
+const data=[
+["ADD R1, R2, R3","ADD","Arithmetic","R-Type","R1, R2, R3"],
+["SUB R2, R3, R1","SUB","Arithmetic","R-Type","R2, R3, R1"],
+["AND R1, R2, R4","AND","Logical","R-Type","R1, R2, R4"],
+["OR R3, R1, R2","OR","Logical","R-Type","R3, R1, R2"],
+["LOAD R2, [100]","LOAD","Data Transfer","I-Type","R2, [100]"],
+["STORE R3, [200]","STORE","Data Transfer","I-Type","R3, [200]"]
+];let current=data[0];
+function newOne(){current=data[Math.floor(Math.random()*data.length)];document.getElementById("mystery").textContent=current[0];document.getElementById("feedback").textContent="New instruction generated. Make your guess.";document.getElementById("answer").style.display="none";document.getElementById("tip").textContent="Hint: the first word is the opcode. Then look at how many register/address fields follow it."}
+function check(){
+ let vals=[document.getElementById("gOp").value,document.getElementById("gType").value,document.getElementById("gFormat").value,document.getElementById("gOperands").value.trim().toUpperCase()];
+ let correct=vals[0]===current[1]&&vals[1]===current[2]&&vals[2]===current[3]&&vals[3]===current[4].toUpperCase();
+ document.getElementById("feedback").textContent=correct?"✓ Excellent! Your CPU decoding is correct.":"Not all fields match. The AI reveal below shows the correct decoding.";
+ ["a1","a2","a3","a4"].forEach((id,i)=>document.getElementById(id).textContent=current[i+1]);
+ document.getElementById("answer").style.display="grid";
+ document.getElementById("tip").textContent=correct?"You correctly identified all four fields.":"Compare your guess with the revealed answer and look for the field you missed.";
+}
+newOne();
+</script></body></html>

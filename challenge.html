@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>04 • Final Challenge</title><link rel="stylesheet" href="style.css"></head>
+<body><header class="top"><div class="brand">CPU <span>COMMAND CENTER</span></div><div class="status"><i></i> STEP 04 / 04</div></header>
+<main class="wrap">
+<nav class="progress"><a href="cycle.html">01 Cycle</a><a href="decoder.html">02 Decoder</a><a href="mission.html">03 Mission Lab</a><a class="active" href="challenge.html">04 Challenge</a></nav>
+<div class="page-title"><span class="num">04</span><h1>Final <em>Challenge</em></h1></div>
+<p class="lead">You have learned the cycle, decoded mystery instructions and built CPU instructions. Now prove what you know.</p>
+<div class="card challenge">
+<div class="score"><span>MISSION <b id="qn">01</b>/05</span><span>SCORE <b id="score">0</b></span></div>
+<div class="question" id="q"></div><div class="answers" id="answers"></div>
+<div class="feedback" id="fb">Choose an answer.</div>
+<button class="ghost" onclick="nextQ()">Next Mission →</button>
+<div class="ai"><b>✦ AI TUTOR</b><span id="hint">Take your time. Think about the role of each stage.</span></div>
+</div>
+<div class="finish card" id="finish" style="display:none"><h2>Command Center Complete.</h2><p id="final"></p><a class="primary" href="cycle.html">Restart Learning Flow ↻</a></div>
+<div class="nav-buttons"><a class="ghost" href="mission.html">← Previous</a><a class="ghost right" href="index.html">Back to Home</a></div>
+</main><footer><strong>CPU Command Center</strong><span>COA Learning Flow Complete</span></footer>
+<script>
+const qs=[
+["Which stage gets the instruction ready for interpretation? ",["FETCH","DECODE","EXECUTE","WRITE-BACK"],1,"DECODE interprets the instruction and identifies its operation and operands."],
+["Which part identifies the operation such as ADD or SUB?",["Operand","Opcode","Register","Clock"],1,"The opcode tells the CPU which operation to perform."],
+["ADD R1, R2, R3 is represented as which format in this project?",["R-Type","I-Type","Memory-only","Address-only"],0,"Three register fields make this an R-Type instruction here."],
+["Which instruction type is mainly used for moving data?",["Arithmetic","Logical","Data Transfer","Control"],2,"LOAD and STORE are data-transfer instructions."],
+["What is the correct instruction-cycle order?",["Decode → Fetch → Execute → Write-Back","Fetch → Decode → Execute → Write-Back","Execute → Fetch → Decode → Write-Back","Fetch → Execute → Decode → Write-Back"],1,"The standard learning flow here is Fetch, Decode, Execute, then Write-Back."]
+];let i=0,s=0,done=false;
+function render(){let x=qs[i];document.getElementById("qn").textContent=String(i+1).padStart(2,"0");document.getElementById("q").textContent=x[0];document.getElementById("fb").textContent="Choose an answer.";document.getElementById("hint").textContent="Think about the COA concept before selecting.";document.getElementById("answers").innerHTML=x[1].map((a,n)=>`<button class="answer" onclick="answer(${n})">${a}</button>`).join("")}
+function answer(n){if(done)return;let x=qs[i],bs=document.querySelectorAll(".answer");if(n===x[2]){s++;bs[n].classList.add("correct");document.getElementById("fb").textContent="✓ Correct! "+x[3]}else{bs[n].classList.add("wrong");bs[x[2]].classList.add("correct");document.getElementById("fb").textContent="Not quite. "+x[3]}document.getElementById("score").textContent=s*20;done=true}
+function nextQ(){if(!done)return;if(i<qs.length-1){i++;done=false;render()}else{document.querySelector(".challenge").style.display="none";document.getElementById("finish").style.display="block";document.getElementById("final").textContent=`You scored ${s*20}/100. The Command Center flow is complete.`}}
+render();
+</script></body></html>

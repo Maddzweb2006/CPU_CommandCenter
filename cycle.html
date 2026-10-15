@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>01 • Instruction Cycle</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="top"><div class="brand">CPU <span>COMMAND CENTER</span></div><div class="status"><i></i> STEP 01 / 04</div></header>
+<main class="wrap">
+<nav class="progress"><a class="active" href="cycle.html">01 Cycle</a><a href="decoder.html">02 Decoder</a><a href="mission.html">03 Mission Lab</a><a href="challenge.html">04 Challenge</a></nav>
+
+<div class="page-title"><span class="num">01</span><h1>Instruction <em>Cycle</em></h1></div>
+<p class="lead">Give the CPU an instruction and watch the Command Center automatically explain what happens at every stage.</p>
+
+<div class="card">
+  <div class="cycle-tools">
+    <div>
+      <label>Instruction given to the CPU</label>
+      <select id="inst" onchange="resetCycle()">
+        <option>ADD R1, R2, R3</option>
+        <option>SUB R1, R2, R3</option>
+        <option>AND R1, R2, R3</option>
+        <option>OR R1, R2, R3</option>
+        <option>LOAD R1, [100]</option>
+        <option>STORE R1, [100]</option>
+      </select>
+    </div>
+    <button class="primary" onclick="run()">AI RUN CYCLE</button>
+    <button class="ghost" id="nextBtn" onclick="next()">NEXT STAGE</button>
+  </div>
+
+  <div class="stage-line" style="margin-top:25px">
+    <button class="stage" id="s0" onclick="jumpTo(0)"><b>FETCH</b><small>Get instruction</small></button>
+    <div class="arrow">→</div>
+    <button class="stage" id="s1" onclick="jumpTo(1)"><b>DECODE</b><small>Understand it</small></button>
+    <div class="arrow">→</div>
+    <button class="stage" id="s2" onclick="jumpTo(2)"><b>EXECUTE</b><small>Perform operation</small></button>
+    <div class="arrow">→</div>
+    <button class="stage" id="s3" onclick="jumpTo(3)"><b>WRITE-BACK</b><small>Save result</small></button>
+  </div>
+
+  <div class="stage-detail">
+    <div class="detail"><b>STAGE INPUT</b><strong id="stageInput">—</strong><p id="inputDesc">Run the cycle to see the instruction entering the CPU.</p></div>
+    <div class="detail"><b>WHAT THE CPU DOES</b><p id="action">The CPU is waiting for an instruction.</p></div>
+    <div class="detail"><b>STAGE OUTPUT</b><strong id="output">—</strong><p id="outputDesc">Each stage produces information used by the next stage.</p></div>
+    <div class="detail"><b>AI CPU EXPLANATION</b><p id="logic">The AI will automatically explain this stage using the instruction you selected.</p></div>
+  </div>
+
+  <div class="ai-stage"><b>✦ AI TUTOR</b><span id="ai">Select an instruction and press RUN CYCLE. The explanation will be generated from that instruction.</span></div>
+</div>
+
+<div class="nav-buttons"><a class="ghost" href="index.html">← Home</a><a class="primary right" href="decoder.html">Next: Mystery Decoder →</a></div>
+</main>
+<footer><strong>CPU Command Center</strong><span>Instruction Cycle</span></footer>
+
+<script>
+const stages=["FETCH","DECODE","EXECUTE","WRITE-BACK"];
+let stage=-1;
+let aiMode=false;
+
+function parseInstruction(){
+  const raw=document.getElementById("inst").value.toUpperCase();
+  const op=raw.split(" ")[0];
+  const info={
+    ADD:{type:"Arithmetic",decode:"Opcode = ADD • Operation = addition • Operands = R1, R2, R3",exec:"R1 (10) + R2 (20) = 30",result:"30",wb:"R3 ← 30"},
+    SUB:{type:"Arithmetic",decode:"Opcode = SUB • Operation = subtraction • Operands = R1, R2, R3",exec:"R1 (20) − R2 (10) = 10",result:"10",wb:"R3 ← 10"},
+    AND:{type:"Logical",decode:"Opcode = AND • Operation = logical AND • Operands = R1, R2, R3",exec:"R1 AND R2 → logical result",result:"AND result",wb:"R3 ← AND result"},
+    OR:{type:"Logical",decode:"Opcode = OR • Operation = logical OR • Operands = R1, R2, R3",exec:"R1 OR R2 → logical result",result:"OR result",wb:"R3 ← OR result"},
+    LOAD:{type:"Data Transfer",decode:"Opcode = LOAD • Operation = memory read • Address = [100]",exec:"Memory[100] → R1",result:"Data from address 100",wb:"R1 ← Memory[100]"},
+    STORE:{type:"Data Transfer",decode:"Opcode = STORE • Operation = memory write • Address = [100]",exec:"R1 → Memory[100]",result:"Data written to memory",wb:"Memory[100] ← R1"}
+  };
+  return {raw,op,info:info[op]};
+}
+
+function resetCycle(){
+  stage=-1;aiMode=false;
+  paint();
+}
+
+function paint(){
+  for(let i=0;i<4;i++){
+    const el=document.getElementById("s"+i);
+    el.className="stage "+(i===stage?"active":i<stage?"done":"");
+  }
+  const d=parseInstruction();
+  document.getElementById("stageInput").textContent=stage<0?"—":getInput(d,stage);
+  document.getElementById("action").textContent=stage<0?"The CPU is waiting. Press AI RUN CYCLE to begin, then use NEXT STAGE at your own pace.":getAction(d,stage);
+  document.getElementById("output").textContent=stage<0?"—":getOutput(d,stage);
+  document.getElementById("inputDesc").textContent=stage===0?"The selected instruction enters the CPU.":stage===1?"FETCH passes the instruction to the decoder.":stage===2?"The decoded operation and operands enter execution.":stage===3?"The completed result moves to its destination.":"Press AI RUN CYCLE to begin the learning flow.";
+  document.getElementById("outputDesc").textContent=stage<0?"Each stage produces information used by the next stage.":getOutputDesc(d,stage);
+  document.getElementById("logic").textContent=stage<0?"AI is ready. Press AI RUN CYCLE; the AI will activate FETCH and wait for you to continue.":getAI(d,stage);
+  document.getElementById("ai").textContent=stage<0?"AI is ready. Press AI RUN CYCLE to start at FETCH. Then click NEXT STAGE whenever you understand the current stage.":stage<3?getAI(d,stage)+" Next recommended action: click NEXT STAGE when you are ready.":getAI(d,stage)+" ✓ The instruction cycle is complete.";
+  const btn=document.getElementById("nextBtn");
+  btn.disabled=stage===-1;
+  btn.textContent=stage>=3?"CYCLE COMPLETE ✓":"NEXT STAGE";
+}
+
+function getInput(d,s){
+  if(s===0)return d.raw;
+  if(s===1)return d.op+" instruction";
+  if(s===2)return d.info.decode;
+  return d.info.result;
+}
+function getAction(d,s){
+  if(s===0)return "FETCH: Bring the instruction into the CPU so processing can begin.";
+  if(s===1)return "DECODE: Identify the opcode, operation and operands needed by the instruction.";
+  if(s===2)return "EXECUTE: Perform the operation described by the decoded instruction.";
+  return "WRITE-BACK: Store the final result in the destination required by the instruction.";
+}
+function getOutput(d,s){
+  if(s===0)return d.raw;
+  if(s===1)return d.op+" decoded ✓";
+  if(s===2)return d.info.result;
+  return d.info.wb;
+}
+function getOutputDesc(d,s){
+  if(s===0)return "The fetched instruction is ready for decoding.";
+  if(s===1)return "The CPU now knows what operation to perform and which operands it needs.";
+  if(s===2)return "The operation has produced its result.";
+  return "The instruction has completed the cycle.";
+}
+function getAI(d,s){
+  if(s===0)return "FETCH receives "+d.raw+" as the instruction to process.";
+  if(s===1)return "DECODE reads the "+d.op+" opcode, identifies the "+d.info.type.toLowerCase()+" operation, and determines its operands.";
+  if(s===2)return "EXECUTE performs the "+d.info.type.toLowerCase()+" operation: "+d.info.exec+".";
+  return "WRITE-BACK completes "+d.raw+" by placing the result where required: "+d.info.wb+".";
+}
+
+function run(){
+  // AI starts the guided cycle at FETCH. It does not rush through the stages.
+  aiMode=true;
+  stage=0;
+  paint();
+}
+
+function next(){
+  if(stage<0){run();return;}
+  if(stage<3){stage++;paint();}
+}
+
+function jumpTo(index){
+  aiMode=true;
+  stage=index;
+  paint();
+}
+
+paint();
+</script>
+</body></html>

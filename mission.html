@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>03 • CPU Mission Lab</title><link rel="stylesheet" href="style.css"></head>
+<body><header class="top"><div class="brand">CPU <span>COMMAND CENTER</span></div><div class="status"><i></i> STEP 03 / 04</div></header>
+<main class="wrap">
+<nav class="progress"><a href="cycle.html">01 Cycle</a><a href="decoder.html">02 Decoder</a><a class="active" href="mission.html">03 Mission Lab</a><a href="challenge.html">04 Challenge</a></nav>
+<div class="page-title"><span class="num">03</span><h1>CPU Mission <em>Lab</em></h1></div>
+<p class="lead">Instead of a boring format builder, solve a CPU mission. The AI gives you a task; you assemble the instruction that would perform it.</p>
+<div class="mission-grid">
+<div class="mission"><span class="tag">✦ AI GENERATED MISSION</span><h2 id="missionText">Add the values in R1 and R2, and place the result in R3.</h2><button class="ghost" style="color:#f7f0df;border-color:#f7f0df" onclick="newMission()">New Mission</button></div>
+<div class="card">
+<div class="build-area">
+<div><label>Instruction Type</label><select id="type"><option value="R">R-Type</option><option value="I">I-Type</option></select></div>
+<div><label>Opcode</label><select id="op"><option>ADD</option><option>SUB</option><option>AND</option><option>OR</option><option>LOAD</option><option>STORE</option></select></div>
+<div><label>Register 1</label><select id="r1"><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select></div>
+<div><label>Register 2</label><select id="r2"><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select></div>
+<div class="wide" id="r3wrap"><label>Destination Register</label><select id="r3"><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select></div>
+</div>
+<div class="preview" id="preview">ADD R1, R2, R3</div>
+<button class="primary check" onclick="checkMission()">SUBMIT INSTRUCTION</button>
+<div class="feedback" id="mfeedback">Build the instruction described in the mission.</div>
+<div class="ai"><b>✦ AI TUTOR</b><span id="mai">Think about the action first: ADD means arithmetic addition, and R-Type uses registers.</span></div>
+</div>
+</div>
+<div class="nav-buttons"><a class="ghost" href="decoder.html">← Previous</a><a class="primary right" href="challenge.html">Next: Final Challenge →</a></div>
+</main><footer><strong>CPU Command Center</strong><span>CPU Mission Lab</span></footer>
+<script>
+const missions=[
+{t:"Add the values in R1 and R2, and place the result in R3.",op:"ADD",r1:"R1",r2:"R2",r3:"R3",type:"R"},
+{t:"Subtract R2 from R4 and place the result in R1.",op:"SUB",r1:"R4",r2:"R2",r3:"R1",type:"R"},
+{t:"Perform a logical AND using R1 and R3, storing the result in R2.",op:"AND",r1:"R1",r2:"R3",r3:"R2",type:"R"},
+{t:"Perform a logical OR using R2 and R4, storing the result in R3.",op:"OR",r1:"R2",r2:"R4",r3:"R3",type:"R"}
+];let m=missions[0];
+function updatePreview(){document.getElementById("preview").textContent=`${document.getElementById("op").value} ${document.getElementById("r1").value}, ${document.getElementById("r2").value}, ${document.getElementById("r3").value}`}
+["type","op","r1","r2","r3"].forEach(id=>document.getElementById(id).addEventListener("change",updatePreview));
+function newMission(){m=missions[Math.floor(Math.random()*missions.length)];document.getElementById("missionText").textContent=m.t;document.getElementById("mfeedback").textContent="New mission loaded. Build the instruction.";document.getElementById("mai").textContent="Read the operation and identify the source and destination registers.";document.getElementById("op").value="ADD";document.getElementById("r1").value="R1";document.getElementById("r2").value="R2";document.getElementById("r3").value="R3";updatePreview()}
+function checkMission(){
+ let got=[document.getElementById("type").value,document.getElementById("op").value,document.getElementById("r1").value,document.getElementById("r2").value,document.getElementById("r3").value];
+ let want=[m.type,m.op,m.r1,m.r2,m.r3];
+ let ok=got.every((x,i)=>x===want[i]);
+ document.getElementById("mfeedback").textContent=ok?"✓ Mission complete! You built the exact instruction required.":"Almost there. Re-read the mission: identify the operation, the two source registers, and the destination register.";
+ document.getElementById("mai").textContent=ok?"The instruction matches the mission perfectly. You have connected instruction type, opcode and operands.":"Hint: the destination is where the result goes; the source registers provide the values.";
+}
+updatePreview();
+</script></body></html>
