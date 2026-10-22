@@ -64,3 +64,6 @@ For `ADD R1, R2, R3`, the flow demonstrates: `FETCH → ADD R1, R2, R3` → `DEC
 
 ### Instruction Cycle interaction
 The AI RUN CYCLE button starts the selected instruction at FETCH. The AI does not auto-rush through the stages. The learner controls progression with NEXT STAGE. Any stage (FETCH, DECODE, EXECUTE, WRITE-BACK) can also be clicked directly to revisit that stage and regenerate its explanation for the selected instruction.
+
+## Deployment Link: https://cpucommandcenter.vercel.app/
+## Github Link: https://github.com/Maddzweb2006/CPU_CommandCenter
